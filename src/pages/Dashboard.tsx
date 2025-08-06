@@ -1,176 +1,249 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { 
-  Target, 
-  LogOut, 
-  Search, 
-  Heart, 
-  Trophy, 
-  Moon, 
-  Sun,
   Scan,
+  Heart,
   BarChart3,
-  TrendingUp
+  Trophy,
+  Zap,
+  TrendingUp,
+  Crown,
+  Lock,
+  Star
 } from 'lucide-react';
 import { ScannerPanel } from '@/components/ScannerPanel';
 import { FavoritesTab } from '@/components/FavoritesTab';
 import { LeaderboardTab } from '@/components/LeaderboardTab';
 import { HistoryTab } from '@/components/HistoryTab';
-import { useTheme } from 'next-themes';
+import Sidebar from '@/components/Sidebar';
+import { cn } from '@/lib/utils';
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('scanner');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  const handleSignOut = async () => {
-    await signOut();
+  const isPremiumFeature = (tabId: string) => {
+    return ['leaderboard', 'generator', 'analytics'].includes(tabId);
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Target className="h-8 w-8 text-primary" />
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  TrendSniper
-                </h1>
-                <p className="text-xs text-muted-foreground">AI Product Analysis</p>
+  const renderTabContent = () => {
+    if (isPremiumFeature(activeTab)) {
+      return (
+        <Card className="glass-card border-2 border-primary/20">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 rounded-full bg-primary/10 border-2 border-primary/20">
+                <Crown className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl gradient-text">Premium Feature</CardTitle>
+            <CardDescription>
+              This feature is available for TrendSniper Elite Pro subscribers
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <div className="space-y-2">
+              <p className="text-muted-foreground">
+                Unlock advanced analytics, store generation, and premium insights
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <Lock className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Pro Only</span>
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" onClick={toggleTheme}>
-                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-              
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+              <div className="glass-card p-4">
+                <TrendingUp className="h-6 w-6 text-primary mb-2 mx-auto" />
+                <h3 className="font-semibold text-sm">Real-time Analytics</h3>
+                <p className="text-xs text-muted-foreground">Advanced market insights</p>
+              </div>
+              <div className="glass-card p-4">
+                <Zap className="h-6 w-6 text-primary mb-2 mx-auto" />
+                <h3 className="font-semibold text-sm">Store Generator</h3>
+                <p className="text-xs text-muted-foreground">AI-powered store creation</p>
+              </div>
+              <div className="glass-card p-4">
+                <Trophy className="h-6 w-6 text-primary mb-2 mx-auto" />
+                <h3 className="font-semibold text-sm">Elite Leaderboard</h3>
+                <p className="text-xs text-muted-foreground">Top performer insights</p>
+              </div>
             </div>
-          </div>
-        </div>
-      </header>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    switch (activeTab) {
+      case 'scanner':
+        return (
+          <Card className="glass-card hover-lift border-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Scan className="h-5 w-5 text-primary" />
+                Elite Product Scanner
+                <Badge className="bg-primary/20 text-primary border-primary/30">
+                  AI-Powered
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Advanced AI analysis for AliExpress, Amazon, Shopify, and TikTok products
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScannerPanel />
+            </CardContent>
+          </Card>
+        );
+      
+      case 'favorites':
+        return (
+          <Card className="glass-card hover-lift">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-primary" />
+                Saved Products
+              </CardTitle>
+              <CardDescription>
+                Your curated collection of high-potential products
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FavoritesTab />
+            </CardContent>
+          </Card>
+        );
+      
+      case 'history':
+        return (
+          <Card className="glass-card hover-lift">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Analysis History
+              </CardTitle>
+              <CardDescription>
+                Complete history of your product scans and insights
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HistoryTab />
+            </CardContent>
+          </Card>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex">
+      {/* Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-2">
-            Welcome back, {user.user_metadata?.full_name || user.email}
-          </h2>
-          <p className="text-muted-foreground">
-            Analyze products from AliExpress, Amazon, Shopify, and TikTok with AI-powered insights
-          </p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="border-b border-border/40 bg-card/30 backdrop-blur-md sticky top-0 z-40">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  Elite Dashboard
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Welcome back, {user.user_metadata?.full_name || 'Elite User'}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Badge className="bg-gradient-to-r from-primary to-purple-400 text-white border-0">
+                  <Star className="h-3 w-3 mr-1" />
+                  Elite Member
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </header>
 
-        {/* Dashboard Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-4 mb-6">
-            <TabsTrigger value="scanner" className="flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Scanner
-            </TabsTrigger>
-            <TabsTrigger value="favorites" className="flex items-center gap-2">
-              <Heart className="h-4 w-4" />
-              Favorites
-            </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              History
-            </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              Leaderboard
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content Area */}
+        <main className={cn(
+          "flex-1 p-6 transition-all duration-300",
+          sidebarCollapsed ? "ml-0" : "ml-0"
+        )}>
+          <div className="max-w-7xl mx-auto">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card className="glass-card hover-lift">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Products Scanned</p>
+                      <p className="text-2xl font-bold text-primary">127</p>
+                    </div>
+                    <Scan className="h-8 w-8 text-primary/60" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card hover-lift">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Favorites</p>
+                      <p className="text-2xl font-bold text-primary">23</p>
+                    </div>
+                    <Heart className="h-8 w-8 text-primary/60" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card hover-lift">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Win Rate</p>
+                      <p className="text-2xl font-bold text-primary">84%</p>
+                    </div>
+                    <Trophy className="h-8 w-8 text-primary/60" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card hover-lift">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Trend Score</p>
+                      <p className="text-2xl font-bold text-primary">9.2</p>
+                    </div>
+                    <TrendingUp className="h-8 w-8 text-primary/60" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-          <TabsContent value="scanner" className="space-y-6">
-            <Card className="bg-gradient-to-br from-card via-card to-card/80">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Scan className="h-5 w-5 text-primary" />
-                  Product Scanner
-                </CardTitle>
-                <CardDescription>
-                  Paste any product URL from AliExpress, Amazon, Shopify, or TikTok to get AI-powered analysis
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScannerPanel />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="favorites" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-primary" />
-                  Favorite Products
-                </CardTitle>
-                <CardDescription>
-                  Products you've saved for later analysis
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FavoritesTab />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="history" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-primary" />
-                  Scan History
-                </CardTitle>
-                <CardDescription>
-                  View all your previous product analyses
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <HistoryTab />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="leaderboard" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5 text-primary" />
-                  Top Products
-                </CardTitle>
-                <CardDescription>
-                  See the highest-rated products from our community
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <LeaderboardTab />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
+            {/* Main Content */}
+            <div className="animate-slide-up">
+              {renderTabContent()}
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
