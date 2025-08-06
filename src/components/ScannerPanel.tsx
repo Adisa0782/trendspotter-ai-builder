@@ -58,20 +58,49 @@ export const ScannerPanel = () => {
     const verdicts: AnalysisResult['verdict'][] = ['winning', 'potential', 'avoid'];
     const randomVerdict = verdicts[Math.floor(Math.random() * verdicts.length)];
     
+    const products = [
+      {
+        title: "Smart Fitness Tracker with Heart Rate Monitor",
+        summary: "High-demand fitness wearable with excellent margins. Strong trend in health monitoring devices with growing market adoption.",
+        revenue: "$5,000 - $25,000/month",
+        audience: "Fitness enthusiasts, health-conscious individuals aged 25-45"
+      },
+      {
+        title: "Wireless Phone Charger Stand with RGB Lighting",
+        summary: "Popular tech accessory with good profit margins. Gaming and tech aesthetic appeals to younger demographics.",
+        revenue: "$3,200 - $18,000/month", 
+        audience: "Gamers, tech enthusiasts, remote workers aged 18-35"
+      },
+      {
+        title: "Portable Bluetooth Speaker - Waterproof Design",
+        summary: "Evergreen product with consistent demand. Outdoor and lifestyle market shows strong year-round sales potential.",
+        revenue: "$4,500 - $22,000/month",
+        audience: "Outdoor enthusiasts, music lovers, travelers aged 20-40"
+      },
+      {
+        title: "LED Strip Lights with App Control",
+        summary: "Trending home decor item with viral potential on social media. Strong impulse purchase behavior in this category.",
+        revenue: "$6,000 - $35,000/month",
+        audience: "Home decorators, content creators, gamers aged 16-30"
+      }
+    ];
+    
+    const randomProduct = products[Math.floor(Math.random() * products.length)];
+    
     return {
-      title: "Premium Wireless Earbuds with Noise Cancellation",
+      title: randomProduct.title,
       image: "/placeholder.svg",
       confidence: Math.floor(Math.random() * 30) + 70,
-      summary: "This product shows strong market potential with high demand in the audio accessories niche. The price point is competitive and the features align with current consumer trends.",
+      summary: randomProduct.summary,
       verdict: randomVerdict,
       advice: randomVerdict === 'winning' 
-        ? "This product has excellent potential. Consider testing with a small budget and scaling quickly."
+        ? "🔥 WINNING PRODUCT! This shows excellent market potential. Launch with confidence - test small budgets first, then scale aggressively. Focus on high-converting creatives and target the identified audience segments."
         : randomVerdict === 'potential'
-        ? "Moderate opportunity. Test carefully and monitor metrics closely before scaling."
-        : "High risk product. Competition is fierce and margins may be too low.",
-      estimatedRevenue: "$2,500 - $15,000/month",
+        ? "⚡ POTENTIAL WINNER. Moderate opportunity detected. Test carefully with small budgets and monitor key metrics (CTR, conversion rates) closely. Scale only after validating performance."
+        : "⚠️ HIGH RISK. Saturated market with fierce competition. Margins may be too low for profitable scaling. Consider alternative products or focus on unique positioning.",
+      estimatedRevenue: randomProduct.revenue,
       competition: randomVerdict === 'winning' ? "Low" : randomVerdict === 'potential' ? "Medium" : "High",
-      targetAudience: "Tech enthusiasts, commuters, fitness enthusiasts aged 18-35"
+      targetAudience: randomProduct.audience
     };
   };
 
@@ -197,6 +226,34 @@ export const ScannerPanel = () => {
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
             ) : null}
             {loading ? 'Analyzing...' : 'Analyze'}
+          </Button>
+        </div>
+        
+        {/* Demo URLs */}
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setUrl("https://www.aliexpress.com/item/1005003245887945.html")}
+            className="text-xs"
+          >
+            Demo AliExpress URL
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setUrl("https://www.amazon.com/dp/B08N5WRWNW")}
+            className="text-xs"
+          >
+            Demo Amazon URL
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setUrl("https://example.myshopify.com/products/wireless-earbuds")}
+            className="text-xs"
+          >
+            Demo Shopify URL
           </Button>
         </div>
         
