@@ -68,6 +68,12 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			boxShadow: {
+				'glow': 'var(--shadow-glow)',
+				'elegant': 'var(--shadow-elegant)',
+				'glass': 'var(--shadow-glass)',
+				'floating': 'var(--shadow-floating)'
+			},
 			keyframes: {
 				'accordion-down': {
 					from: {
