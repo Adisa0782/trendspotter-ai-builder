@@ -18,6 +18,7 @@ import { ScannerPanel } from '@/components/ScannerPanel';
 import { FavoritesTab } from '@/components/FavoritesTab';
 import { LeaderboardTab } from '@/components/LeaderboardTab';
 import { HistoryTab } from '@/components/HistoryTab';
+import { TrendAnalysisTab } from '@/components/TrendAnalysisTab';
 import Sidebar from '@/components/Sidebar';
 import { cn } from '@/lib/utils';
 
@@ -31,7 +32,7 @@ const Dashboard = () => {
   }
 
   const isPremiumFeature = (tabId: string) => {
-    return ['leaderboard', 'generator', 'analytics'].includes(tabId);
+    return ['trends', 'leaderboard', 'generator', 'analytics'].includes(tabId);
   };
 
   const renderTabContent = () => {
@@ -136,6 +137,28 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <HistoryTab />
+            </CardContent>
+          </Card>
+        );
+      
+      case 'trends':
+        return (
+          <Card className="glass-card hover-lift border-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Trend Analysis
+                <Badge className="bg-primary/20 text-primary border-primary/30">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Pro
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Advanced keyword trend analysis and market insights powered by Google Trends
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TrendAnalysisTab />
             </CardContent>
           </Card>
         );

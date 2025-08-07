@@ -44,9 +44,10 @@ const Sidebar = ({ activeTab, onTabChange, collapsed, onToggleCollapse }: Sideba
     { id: 'scanner', label: 'Scanner', icon: Search, isPro: false },
     { id: 'favorites', label: 'Favorites', icon: Heart, isPro: false },
     { id: 'history', label: 'History', icon: BarChart3, isPro: false },
+    { id: 'trends', label: 'Trend Analysis', icon: TrendingUp, isPro: true },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, isPro: true },
     { id: 'generator', label: 'Store Generator', icon: Zap, isPro: true },
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp, isPro: true },
+    { id: 'analytics', label: 'Analytics', icon: Target, isPro: true },
   ];
 
   return (
