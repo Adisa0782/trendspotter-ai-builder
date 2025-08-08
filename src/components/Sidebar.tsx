@@ -46,7 +46,7 @@ const Sidebar = ({ activeTab, onTabChange, collapsed, onToggleCollapse }: Sideba
     { id: 'favorites', label: 'Favorites', icon: Heart, isPro: false },
     { id: 'history', label: 'History', icon: BarChart3, isPro: false },
     { id: 'trends', label: 'Trend Analysis', icon: TrendingUp, isPro: true },
-    { id: 'generator', label: 'Store Generator', icon: Store, isPro: true },
+    { id: 'generator', label: 'Store Generator', icon: Store, isPro: false },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, isPro: true },
     { id: 'analytics', label: 'Analytics', icon: Target, isPro: true },
   ];
