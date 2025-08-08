@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Select,
   SelectContent,
@@ -14,14 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { toast } from '@/hooks/use-toast';
 import {
   Store,
   Users,
@@ -36,7 +30,13 @@ import {
   X,
   Zap,
   CheckCircle,
-  Loader2
+  Loader2,
+  Eye,
+  ShoppingCart,
+  Star,
+  Globe,
+  Code,
+  Smartphone
 } from 'lucide-react';
 
 interface TeamMember {
@@ -48,11 +48,13 @@ interface TeamMember {
 }
 
 interface StoreData {
+  collaborationCode: string;
+  storeUrl: string;
   name: string;
-  niche: string;
   theme: string;
-  mainColor: string;
-  demoProducts: boolean;
+  productSource: string;
+  category: string;
+  productCount: number;
 }
 
 const StoreGeneratorTab = () => {
@@ -64,15 +66,19 @@ const StoreGeneratorTab = () => {
   ]);
   
   const [storeData, setStoreData] = useState<StoreData>({
+    collaborationCode: '',
+    storeUrl: '',
     name: '',
-    niche: '',
     theme: '',
-    mainColor: '#8B5CF6',
-    demoProducts: true
+    productSource: '',
+    category: '',
+    productCount: 25
   });
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStatus, setCurrentStatus] = useState('');
   
@@ -83,8 +89,17 @@ const StoreGeneratorTab = () => {
     productsAdded: 47
   });
 
-  const roles = ['Owner', 'Designer', 'Product Manager', 'Developer', 'Marketer'];
-  const themes = ['Random', 'Minimal', 'Modern', 'Luxury', 'Fashion', 'Electronics'];
+  const themes = ['Dawn', 'Debut', 'Brooklyn', 'Impulse', 'District'];
+  const productSources = ['AliExpress', 'CJ Dropshipping', 'Custom'];
+  const categories = ['Fashion', 'Electronics', 'Beauty', 'Home', 'Sports'];
+  
+  const sampleProducts = [
+    { id: 1, title: 'Wireless Bluetooth Headphones', price: '$89.99', image: '/placeholder.svg' },
+    { id: 2, title: 'Smartphone Case', price: '$29.99', image: '/placeholder.svg' },
+    { id: 3, title: 'LED Desk Lamp', price: '$49.99', image: '/placeholder.svg' },
+    { id: 4, title: 'Portable Charger', price: '$39.99', image: '/placeholder.svg' },
+    { id: 5, title: 'Fitness Tracker', price: '$129.99', image: '/placeholder.svg' },
+  ];
   
   const statusMessages = [
     'Initializing store creation...',
@@ -124,7 +139,7 @@ const StoreGeneratorTab = () => {
   };
 
   const handleGenerateStore = async () => {
-    if (!storeData.name || !storeData.niche) return;
+    if (!storeData.name || !storeData.storeUrl) return;
     
     setIsGenerating(true);
     setProgress(0);
@@ -133,11 +148,34 @@ const StoreGeneratorTab = () => {
     for (let i = 0; i < statusMessages.length; i++) {
       setCurrentStatus(statusMessages[i]);
       setProgress((i + 1) * (100 / statusMessages.length));
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1200));
     }
     
     setIsGenerating(false);
     setIsComplete(true);
+    toast({
+      title: "Store Generated!",
+      description: "Your store is ready to launch.",
+    });
+  };
+
+  const handleImportProducts = async () => {
+    setIsImporting(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsImporting(false);
+    toast({
+      title: "Products Imported",
+      description: `${storeData.productCount} products imported successfully.`,
+    });
+  };
+
+  const handlePreviewStore = () => {
+    setIsPreviewing(true);
+    setTimeout(() => setIsPreviewing(false), 1000);
+    toast({
+      title: "Preview Updated",
+      description: "Store preview has been refreshed.",
+    });
   };
 
   const resetGeneration = () => {
@@ -148,165 +186,88 @@ const StoreGeneratorTab = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 mb-8">
         <div className="flex items-center justify-center gap-3">
-          <div className="p-3 rounded-full bg-primary/10 border-2 border-primary/20">
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/30 backdrop-blur-sm">
             <Store className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-4xl font-bold gradient-text">Store Generator</h1>
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-blue-500 bg-clip-text text-transparent">
+            Store Generator
+          </h1>
         </div>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
           Collaborate with your team to launch a fully ready Shopify store in minutes.
         </p>
       </div>
 
-      {/* Team Collaboration Bar */}
-      <Card className="glass-card border-2 border-primary/10">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            Team Collaboration
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="glass-button">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Invite Team Members
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="glass-card">
-                <DialogHeader>
-                  <DialogTitle>Invite Team Member</DialogTitle>
-                  <DialogDescription>
-                    Enter email address to invite a new team member
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter email address"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      className="mt-2"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={handleInviteTeamMember}
-                      className="flex-1"
-                      disabled={!inviteEmail.trim()}
-                    >
-                      Send Invite
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setIsInviteModalOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+      {/* Two Column Layout */}
+      <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        {/* Left Column - Store Setup Form */}
+        <div className="space-y-6">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {teamMembers.map((member) => (
-              <div key={member.id} className="glass-card p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={member.avatar} />
-                    <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">{member.name}</p>
-                    <p className="text-xs text-muted-foreground">{member.email}</p>
-                  </div>
-                  {member.role !== 'Owner' && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeMember(member.id)}
-                      className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  )}
-                </div>
-                <Select value={member.role} onValueChange={(value) => updateMemberRole(member.id, value)}>
-                  <SelectTrigger className="h-8">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        <div className="flex items-center gap-2">
-                          {role === 'Owner' && <Crown className="h-3 w-3 text-primary" />}
-                          {role}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Store Generation Form */}
-      {!isGenerating && !isComplete && (
-        <Card className="glass-card border-2 border-primary/20 hover-lift">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
-              Store Configuration
-            </CardTitle>
-            <CardDescription>
-              Configure your store settings and theme preferences
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Store Setup Form */}
+          <Card className="backdrop-blur-xl bg-background/60 border border-primary/20 rounded-2xl shadow-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <Settings className="h-6 w-6 text-primary" />
+                Store Setup
+              </CardTitle>
+              <CardDescription className="text-base">
+                Configure your new Shopify store
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Collaboration Code */}
               <div className="space-y-2">
-                <Label htmlFor="storeName">Store Name</Label>
+                <Label htmlFor="collaborationCode" className="text-sm font-semibold">Collaboration Code</Label>
+                <Input
+                  id="collaborationCode"
+                  placeholder="Enter Shopify staff access code"
+                  value={storeData.collaborationCode}
+                  onChange={(e) => setStoreData({...storeData, collaborationCode: e.target.value})}
+                  className="bg-background/50 border-primary/30 h-12"
+                />
+              </div>
+
+              {/* Store URL */}
+              <div className="space-y-2">
+                <Label htmlFor="storeUrl" className="text-sm font-semibold">Store URL</Label>
+                <div className="flex">
+                  <Input
+                    id="storeUrl"
+                    placeholder="your-store"
+                    value={storeData.storeUrl}
+                    onChange={(e) => setStoreData({...storeData, storeUrl: e.target.value})}
+                    className="bg-background/50 border-primary/30 h-12 rounded-r-none"
+                  />
+                  <div className="bg-muted/50 border border-l-0 border-primary/30 rounded-r-lg px-3 flex items-center text-sm text-muted-foreground">
+                    .myshopify.com
+                  </div>
+                </div>
+              </div>
+
+              {/* Store Name */}
+              <div className="space-y-2">
+                <Label htmlFor="storeName" className="text-sm font-semibold">Store Name</Label>
                 <Input
                   id="storeName"
                   placeholder="Enter your store name"
                   value={storeData.name}
                   onChange={(e) => setStoreData({...storeData, name: e.target.value})}
-                  className="glass-card"
+                  className="bg-background/50 border-primary/30 h-12"
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="storeNiche">Store Niche</Label>
-                <Input
-                  id="storeNiche"
-                  placeholder="e.g., Fashion, Electronics, Beauty"
-                  value={storeData.niche}
-                  onChange={(e) => setStoreData({...storeData, niche: e.target.value})}
-                  className="glass-card"
-                />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Theme Selection */}
               <div className="space-y-2">
-                <Label htmlFor="theme">Theme Selection</Label>
+                <Label htmlFor="theme" className="text-sm font-semibold">Theme Selection</Label>
                 <Select value={storeData.theme} onValueChange={(value) => setStoreData({...storeData, theme: value})}>
-                  <SelectTrigger className="glass-card">
-                    <SelectValue placeholder="Select a theme" />
+                  <SelectTrigger className="bg-background/50 border-primary/30 h-12">
+                    <SelectValue placeholder="Choose a theme" />
                   </SelectTrigger>
-                  <SelectContent className="glass-card">
+                  <SelectContent>
                     {themes.map((theme) => (
                       <SelectItem key={theme} value={theme}>
                         {theme}
@@ -316,142 +277,324 @@ const StoreGeneratorTab = () => {
                 </Select>
               </div>
 
+              {/* Product Source */}
               <div className="space-y-2">
-                <Label htmlFor="mainColor">Main Color</Label>
-                <div className="flex gap-3 items-center">
-                  <Input
-                    id="mainColor"
-                    type="color"
-                    value={storeData.mainColor}
-                    onChange={(e) => setStoreData({...storeData, mainColor: e.target.value})}
-                    className="w-16 h-10 border-0 rounded-lg cursor-pointer"
-                  />
-                  <Input
-                    value={storeData.mainColor}
-                    onChange={(e) => setStoreData({...storeData, mainColor: e.target.value})}
-                    className="glass-card flex-1"
-                    placeholder="#8B5CF6"
-                  />
+                <Label htmlFor="productSource" className="text-sm font-semibold">Product Source</Label>
+                <Select value={storeData.productSource} onValueChange={(value) => setStoreData({...storeData, productSource: value})}>
+                  <SelectTrigger className="bg-background/50 border-primary/30 h-12">
+                    <SelectValue placeholder="Select product source" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {productSources.map((source) => (
+                      <SelectItem key={source} value={source}>
+                        {source}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Product Category */}
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-sm font-semibold">Product Category</Label>
+                <Select value={storeData.category} onValueChange={(value) => setStoreData({...storeData, category: value})}>
+                  <SelectTrigger className="bg-background/50 border-primary/30 h-12">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Number of Products */}
+              <div className="space-y-2">
+                <Label htmlFor="productCount" className="text-sm font-semibold">Number of Products</Label>
+                <Input
+                  id="productCount"
+                  type="number"
+                  min="1"
+                  max="100"
+                  placeholder="25"
+                  value={storeData.productCount}
+                  onChange={(e) => setStoreData({...storeData, productCount: parseInt(e.target.value) || 25})}
+                  className="bg-background/50 border-primary/30 h-12"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3 pt-4">
+                <Button 
+                  onClick={handleGenerateStore}
+                  className="w-full h-14 text-lg bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                  disabled={!storeData.name || !storeData.storeUrl || isGenerating}
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-5 w-5 mr-2" />
+                      Generate Store
+                    </>
+                  )}
+                </Button>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleImportProducts}
+                    disabled={isImporting || !storeData.productSource}
+                    className="h-12 border-primary/30 hover:bg-primary/10"
+                  >
+                    {isImporting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Importing...
+                      </>
+                    ) : (
+                      <>
+                        <Package className="h-4 w-4 mr-2" />
+                        Import Products
+                      </>
+                    )}
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    onClick={handlePreviewStore}
+                    disabled={isPreviewing}
+                    className="h-12 border-primary/30 hover:bg-primary/10"
+                  >
+                    {isPreviewing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-4 w-4 mr-2" />
+                        Preview Store
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            <div className="flex items-center justify-between p-4 glass-card rounded-lg">
-              <div className="space-y-1">
-                <Label htmlFor="demoProducts" className="text-sm font-medium">
-                  Enable Demo Products
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Include sample products to showcase your store
-                </p>
+          {/* Product Preview List */}
+          <Card className="backdrop-blur-xl bg-background/60 border border-primary/20 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5 text-primary" />
+                Sample Products
+              </CardTitle>
+              <CardDescription>
+                Preview of products to be imported
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {sampleProducts.map((product) => (
+                  <div key={product.id} className="flex items-center gap-3 p-3 bg-background/30 rounded-lg border border-primary/10">
+                    <div className="w-12 h-12 bg-muted/50 rounded-lg flex items-center justify-center">
+                      <Package className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{product.title}</p>
+                      <p className="text-primary font-semibold">{product.price}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      <span className="text-xs text-muted-foreground">4.5</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <Switch
-                id="demoProducts"
-                checked={storeData.demoProducts}
-                onCheckedChange={(checked) => setStoreData({...storeData, demoProducts: checked})}
-              />
-            </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <Button 
-              onClick={handleGenerateStore}
-              className="w-full h-12 text-lg hover-glow"
-              disabled={!storeData.name || !storeData.niche}
-            >
-              <Zap className="h-5 w-5 mr-2" />
-              Generate Store
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+        {/* Right Column - Live Store Preview */}
+        <div className="space-y-6">
+          <Card className="backdrop-blur-xl bg-background/60 border border-primary/20 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5 text-primary" />
+                Live Store Preview
+              </CardTitle>
+              <CardDescription>
+                See how your store will look
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-[9/16] lg:aspect-video rounded-xl bg-gradient-to-br from-primary/5 via-background to-purple-500/5 border border-primary/10 p-6 flex flex-col">
+                {/* Preview Header */}
+                <div className="flex items-center gap-2 mb-4 p-2 bg-background/50 rounded-lg">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  </div>
+                  <div className="flex-1 bg-muted/30 rounded px-2 py-1 text-xs text-center">
+                    {storeData.storeUrl ? `${storeData.storeUrl}.myshopify.com` : 'your-store.myshopify.com'}
+                  </div>
+                </div>
+                
+                {/* Preview Content */}
+                <div className="flex-1 space-y-4">
+                  {isPreviewing ? (
+                    <div className="h-full flex items-center justify-center">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : (
+                    <>
+                      {/* Store Header */}
+                      <div className="text-center space-y-2">
+                        <h3 className="text-xl font-bold">
+                          {storeData.name || 'Your Store Name'}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {storeData.category || 'Premium Products'}
+                        </p>
+                      </div>
+                      
+                      {/* Product Grid */}
+                      <div className="grid grid-cols-2 gap-3">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="bg-background/30 rounded-lg p-3 border border-primary/10">
+                            <div className="aspect-square bg-muted/30 rounded mb-2 flex items-center justify-center">
+                              <Package className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <Skeleton className="h-3 w-full mb-1" />
+                            <Skeleton className="h-3 w-1/2" />
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                {/* Mobile Preview Toggle */}
+                <div className="flex justify-center mt-4">
+                  <div className="flex bg-background/50 rounded-lg p-1">
+                    <Button variant="ghost" size="sm" className="h-8 px-3">
+                      <Smartphone className="h-3 w-3 mr-1" />
+                      Mobile
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 px-3 bg-primary/20">
+                      <Globe className="h-3 w-3 mr-1" />
+                      Desktop
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
-      {/* Progress Card */}
+      {/* Progress Modal Overlay */}
       {isGenerating && (
-        <Card className="glass-card border-2 border-primary/20 animate-slide-up">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Loader2 className="h-5 w-5 text-primary animate-spin" />
-              Generating Your Store
-            </CardTitle>
-            <CardDescription>
-              Please wait while we create your Shopify store
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span>Progress</span>
-                <span>{Math.round(progress)}%</span>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="backdrop-blur-xl bg-background/90 border border-primary/30 rounded-2xl shadow-2xl max-w-md w-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-center">
+                <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                Generating Your Store
+              </CardTitle>
+              <CardDescription className="text-center">
+                Please wait while we create your Shopify store
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <Progress value={progress} className="h-3" />
               </div>
-              <Progress value={progress} className="h-3" />
-            </div>
-            
-            <div className="glass-card p-4 text-center">
-              <Loader2 className="h-8 w-8 text-primary animate-spin mx-auto mb-3" />
-              <p className="font-medium">{currentStatus}</p>
-            </div>
-          </CardContent>
-        </Card>
+              
+              <div className="bg-primary/5 p-4 rounded-lg text-center border border-primary/20">
+                <Loader2 className="h-8 w-8 text-primary animate-spin mx-auto mb-3" />
+                <p className="font-medium">{currentStatus}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
-      {/* Result Card */}
+
+      {/* Success Modal Overlay */}
       {isComplete && (
-        <Card className="glass-card border-2 border-primary/20 animate-slide-up">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              Store Generated Successfully!
-            </CardTitle>
-            <CardDescription>
-              Your Shopify store is ready to launch
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="glass-card p-6 space-y-4">
-              <div className="aspect-video rounded-lg bg-gradient-to-br from-primary/20 to-purple-400/20 flex items-center justify-center border-2 border-primary/10">
-                <div className="text-center space-y-2">
-                  <Store className="h-12 w-12 text-primary mx-auto" />
-                  <p className="text-sm text-muted-foreground">Store Preview</p>
-                  <p className="font-medium">{storeData.name}</p>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="backdrop-blur-xl bg-background/90 border border-green-500/30 rounded-2xl shadow-2xl max-w-lg w-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-center text-green-500">
+                <CheckCircle className="h-6 w-6" />
+                Store Generated Successfully!
+              </CardTitle>
+              <CardDescription className="text-center">
+                Your Shopify store is ready to launch
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-gradient-to-br from-green-500/10 to-primary/10 p-6 rounded-xl border border-green-500/20">
+                <div className="text-center space-y-3">
+                  <Store className="h-16 w-16 text-green-500 mx-auto" />
+                  <h3 className="text-xl font-bold">{storeData.name}</h3>
+                  <p className="text-sm text-muted-foreground">{storeData.storeUrl}.myshopify.com</p>
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button className="flex-1 hover-glow">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div className="bg-background/50 p-3 rounded-lg border border-primary/10">
+                  <p className="text-sm text-muted-foreground">Theme</p>
+                  <p className="font-semibold">{storeData.theme}</p>
+                </div>
+                <div className="bg-background/50 p-3 rounded-lg border border-primary/10">
+                  <p className="text-sm text-muted-foreground">Products</p>
+                  <p className="font-semibold">{storeData.productCount}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button className="flex-1 bg-green-600 hover:bg-green-700">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Open Store
                 </Button>
-                <Button variant="outline" className="glass-button">
+                <Button variant="outline" className="flex-1">
                   <Share2 className="h-4 w-4 mr-2" />
-                  Share with Team
+                  Share
                 </Button>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="glass-card p-4 text-center">
-                <p className="text-sm text-muted-foreground">Store URL</p>
-                <p className="font-medium text-primary truncate">{generatedStore.url}</p>
-              </div>
-              <div className="glass-card p-4 text-center">
-                <p className="text-sm text-muted-foreground">Theme Used</p>
-                <p className="font-medium">{storeData.theme || 'Modern'}</p>
-              </div>
-              <div className="glass-card p-4 text-center">
-                <p className="text-sm text-muted-foreground">Products Added</p>
-                <p className="font-medium">{storeData.demoProducts ? generatedStore.productsAdded : 0}</p>
-              </div>
-            </div>
-
-            <Button 
-              variant="outline" 
-              onClick={resetGeneration}
-              className="w-full glass-button"
-            >
-              Generate Another Store
-            </Button>
-          </CardContent>
-        </Card>
+              <Button 
+                variant="ghost" 
+                onClick={resetGeneration}
+                className="w-full"
+              >
+                Generate Another Store
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       )}
+
+      {/* Footer */}
+      <div className="text-center mt-12 pb-8">
+        <p className="text-sm text-muted-foreground">
+          Powered by <span className="text-primary font-semibold">TrendSniper AI Store Builder</span>
+        </p>
+      </div>
     </div>
   );
 };
