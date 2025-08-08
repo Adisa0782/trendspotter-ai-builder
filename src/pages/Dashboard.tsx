@@ -33,7 +33,7 @@ const Dashboard = () => {
   }
 
   const isPremiumFeature = (tabId: string) => {
-    return ['trends', 'leaderboard', 'generator', 'analytics'].includes(tabId);
+    return ['trends', 'leaderboard', 'analytics'].includes(tabId);
   };
 
   const renderTabContent = () => {
