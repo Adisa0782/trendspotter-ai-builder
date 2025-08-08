@@ -19,6 +19,7 @@ import { FavoritesTab } from '@/components/FavoritesTab';
 import { LeaderboardTab } from '@/components/LeaderboardTab';
 import { HistoryTab } from '@/components/HistoryTab';
 import { TrendAnalysisTab } from '@/components/TrendAnalysisTab';
+import StoreGeneratorTab from '@/components/StoreGeneratorTab';
 import Sidebar from '@/components/Sidebar';
 import { cn } from '@/lib/utils';
 
@@ -159,6 +160,28 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <TrendAnalysisTab />
+            </CardContent>
+          </Card>
+        );
+      
+      case 'generator':
+        return (
+          <Card className="glass-card hover-lift border-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                Store Generator
+                <Badge className="bg-primary/20 text-primary border-primary/30">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Pro
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                AI-powered Shopify store creation with team collaboration
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <StoreGeneratorTab />
             </CardContent>
           </Card>
         );

@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Settings,
   Crown,
-  Zap
+  Zap,
+  Store
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
@@ -45,8 +46,8 @@ const Sidebar = ({ activeTab, onTabChange, collapsed, onToggleCollapse }: Sideba
     { id: 'favorites', label: 'Favorites', icon: Heart, isPro: false },
     { id: 'history', label: 'History', icon: BarChart3, isPro: false },
     { id: 'trends', label: 'Trend Analysis', icon: TrendingUp, isPro: true },
+    { id: 'generator', label: 'Store Generator', icon: Store, isPro: true },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, isPro: true },
-    { id: 'generator', label: 'Store Generator', icon: Zap, isPro: true },
     { id: 'analytics', label: 'Analytics', icon: Target, isPro: true },
   ];
 
