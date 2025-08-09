@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { 
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
 import {
   Store,
@@ -47,15 +59,26 @@ interface TeamMember {
   avatar?: string;
 }
 
-interface StoreData {
-  collaborationCode: string;
-  storeUrl: string;
-  name: string;
-  theme: string;
-  productSource: string;
-  category: string;
-  productCount: number;
-}
+// Validation schema
+const storeSchema = z.object({
+  collaborationCode: z.string().min(1, "Collaboration code is required"),
+  storeUrl: z.string()
+    .min(3, "Store URL must be at least 3 characters")
+    .max(30, "Store URL must be less than 30 characters")
+    .regex(/^[a-z0-9-]+$/, "Only lowercase letters, numbers, and hyphens allowed")
+    .refine((val) => !val.startsWith('-') && !val.endsWith('-'), "Cannot start or end with hyphen"),
+  name: z.string()
+    .min(2, "Store name must be at least 2 characters")
+    .max(50, "Store name must be less than 50 characters"),
+  theme: z.string().min(1, "Please select a theme"),
+  productSource: z.string().min(1, "Please select a product source"),
+  category: z.string().min(1, "Please select a category"),
+  productCount: z.number()
+    .min(1, "Must have at least 1 product")
+    .max(100, "Cannot exceed 100 products")
+});
+
+type StoreFormData = z.infer<typeof storeSchema>;
 
 const StoreGeneratorTab = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -65,14 +88,18 @@ const StoreGeneratorTab = () => {
     { id: '2', name: 'Mike Chen', email: 'mike@example.com', role: 'Designer', avatar: '' },
   ]);
   
-  const [storeData, setStoreData] = useState<StoreData>({
-    collaborationCode: '',
-    storeUrl: '',
-    name: '',
-    theme: '',
-    productSource: '',
-    category: '',
-    productCount: 25
+  // Form setup with validation
+  const form = useForm<StoreFormData>({
+    resolver: zodResolver(storeSchema),
+    defaultValues: {
+      collaborationCode: '',
+      storeUrl: '',
+      name: '',
+      theme: '',
+      productSource: '',
+      category: '',
+      productCount: 25
+    }
   });
   
   const [isGenerating, setIsGenerating] = useState(false);
@@ -138,9 +165,7 @@ const StoreGeneratorTab = () => {
     ));
   };
 
-  const handleGenerateStore = async () => {
-    if (!storeData.name || !storeData.storeUrl) return;
-    
+  const handleGenerateStore = async (data: StoreFormData) => {
     setIsGenerating(true);
     setProgress(0);
     
@@ -160,12 +185,22 @@ const StoreGeneratorTab = () => {
   };
 
   const handleImportProducts = async () => {
+    const isValid = await form.trigger(['productSource', 'category', 'productCount']);
+    if (!isValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the form errors before importing products.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsImporting(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsImporting(false);
     toast({
       title: "Products Imported",
-      description: `${storeData.productCount} products imported successfully.`,
+      description: `${form.getValues('productCount')} products imported successfully.`,
     });
   };
 
@@ -218,174 +253,236 @@ const StoreGeneratorTab = () => {
                 Configure your new Shopify store
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Collaboration Code */}
-              <div className="space-y-2">
-                <Label htmlFor="collaborationCode" className="text-sm font-semibold">Collaboration Code</Label>
-                <Input
-                  id="collaborationCode"
-                  placeholder="Enter Shopify staff access code"
-                  value={storeData.collaborationCode}
-                  onChange={(e) => setStoreData({...storeData, collaborationCode: e.target.value})}
-                  className="bg-background/50 border-primary/30 h-12"
-                />
-              </div>
-
-              {/* Store URL */}
-              <div className="space-y-2">
-                <Label htmlFor="storeUrl" className="text-sm font-semibold">Store URL</Label>
-                <div className="flex">
-                  <Input
-                    id="storeUrl"
-                    placeholder="your-store"
-                    value={storeData.storeUrl}
-                    onChange={(e) => setStoreData({...storeData, storeUrl: e.target.value})}
-                    className="bg-background/50 border-primary/30 h-12 rounded-r-none"
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleGenerateStore)} className="space-y-6">
+                  {/* Collaboration Code */}
+                  <FormField
+                    control={form.control}
+                    name="collaborationCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-semibold">Collaboration Code</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter Shopify staff access code"
+                            {...field}
+                            className="bg-background/50 border-primary/30 h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <div className="bg-muted/50 border border-l-0 border-primary/30 rounded-r-lg px-3 flex items-center text-sm text-muted-foreground">
-                    .myshopify.com
+
+                  {/* Store URL */}
+                  <FormField
+                    control={form.control}
+                    name="storeUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-semibold">Store URL</FormLabel>
+                        <FormControl>
+                          <div className="flex">
+                            <Input
+                              placeholder="your-store"
+                              {...field}
+                              className="bg-background/50 border-primary/30 h-12 rounded-r-none"
+                            />
+                            <div className="bg-muted/50 border border-l-0 border-primary/30 rounded-r-lg px-3 flex items-center text-sm text-muted-foreground">
+                              .myshopify.com
+                            </div>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Store Name */}
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-semibold">Store Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your store name"
+                            {...field}
+                            className="bg-background/50 border-primary/30 h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Theme Selection */}
+                  <FormField
+                    control={form.control}
+                    name="theme"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-semibold">Theme Selection</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background/50 border-primary/30 h-12">
+                              <SelectValue placeholder="Choose a theme" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {themes.map((theme) => (
+                              <SelectItem key={theme} value={theme}>
+                                {theme}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Product Source */}
+                  <FormField
+                    control={form.control}
+                    name="productSource"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-semibold">Product Source</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background/50 border-primary/30 h-12">
+                              <SelectValue placeholder="Select product source" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {productSources.map((source) => (
+                              <SelectItem key={source} value={source}>
+                                {source}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Product Category */}
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-semibold">Product Category</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background/50 border-primary/30 h-12">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Number of Products */}
+                  <FormField
+                    control={form.control}
+                    name="productCount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-semibold">Number of Products</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="1"
+                            max="100"
+                            placeholder="25"
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            className="bg-background/50 border-primary/30 h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Action Buttons */}
+                  <div className="space-y-3 pt-4">
+                    <Button 
+                      type="submit"
+                      className="w-full h-14 text-lg bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                      disabled={isGenerating}
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="h-5 w-5 mr-2" />
+                          Generate Store
+                        </>
+                      )}
+                    </Button>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        onClick={handleImportProducts}
+                        disabled={isImporting}
+                        className="h-12 border-primary/30 hover:bg-primary/10"
+                      >
+                        {isImporting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Importing...
+                          </>
+                        ) : (
+                          <>
+                            <Package className="h-4 w-4 mr-2" />
+                            Import Products
+                          </>
+                        )}
+                      </Button>
+                      
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        onClick={handlePreviewStore}
+                        disabled={isPreviewing}
+                        className="h-12 border-primary/30 hover:bg-primary/10"
+                      >
+                        {isPreviewing ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="h-4 w-4 mr-2" />
+                            Preview Store
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Store Name */}
-              <div className="space-y-2">
-                <Label htmlFor="storeName" className="text-sm font-semibold">Store Name</Label>
-                <Input
-                  id="storeName"
-                  placeholder="Enter your store name"
-                  value={storeData.name}
-                  onChange={(e) => setStoreData({...storeData, name: e.target.value})}
-                  className="bg-background/50 border-primary/30 h-12"
-                />
-              </div>
-
-              {/* Theme Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="theme" className="text-sm font-semibold">Theme Selection</Label>
-                <Select value={storeData.theme} onValueChange={(value) => setStoreData({...storeData, theme: value})}>
-                  <SelectTrigger className="bg-background/50 border-primary/30 h-12">
-                    <SelectValue placeholder="Choose a theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {themes.map((theme) => (
-                      <SelectItem key={theme} value={theme}>
-                        {theme}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Product Source */}
-              <div className="space-y-2">
-                <Label htmlFor="productSource" className="text-sm font-semibold">Product Source</Label>
-                <Select value={storeData.productSource} onValueChange={(value) => setStoreData({...storeData, productSource: value})}>
-                  <SelectTrigger className="bg-background/50 border-primary/30 h-12">
-                    <SelectValue placeholder="Select product source" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {productSources.map((source) => (
-                      <SelectItem key={source} value={source}>
-                        {source}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Product Category */}
-              <div className="space-y-2">
-                <Label htmlFor="category" className="text-sm font-semibold">Product Category</Label>
-                <Select value={storeData.category} onValueChange={(value) => setStoreData({...storeData, category: value})}>
-                  <SelectTrigger className="bg-background/50 border-primary/30 h-12">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Number of Products */}
-              <div className="space-y-2">
-                <Label htmlFor="productCount" className="text-sm font-semibold">Number of Products</Label>
-                <Input
-                  id="productCount"
-                  type="number"
-                  min="1"
-                  max="100"
-                  placeholder="25"
-                  value={storeData.productCount}
-                  onChange={(e) => setStoreData({...storeData, productCount: parseInt(e.target.value) || 25})}
-                  className="bg-background/50 border-primary/30 h-12"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3 pt-4">
-                <Button 
-                  onClick={handleGenerateStore}
-                  className="w-full h-14 text-lg bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={!storeData.name || !storeData.storeUrl || isGenerating}
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="h-5 w-5 mr-2" />
-                      Generate Store
-                    </>
-                  )}
-                </Button>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleImportProducts}
-                    disabled={isImporting || !storeData.productSource}
-                    className="h-12 border-primary/30 hover:bg-primary/10"
-                  >
-                    {isImporting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Importing...
-                      </>
-                    ) : (
-                      <>
-                        <Package className="h-4 w-4 mr-2" />
-                        Import Products
-                      </>
-                    )}
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    onClick={handlePreviewStore}
-                    disabled={isPreviewing}
-                    className="h-12 border-primary/30 hover:bg-primary/10"
-                  >
-                    {isPreviewing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="h-4 w-4 mr-2" />
-                        Preview Store
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
+                </form>
+              </Form>
             </CardContent>
           </Card>
 
@@ -444,7 +541,7 @@ const StoreGeneratorTab = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   </div>
                   <div className="flex-1 bg-muted/30 rounded px-2 py-1 text-xs text-center">
-                    {storeData.storeUrl ? `${storeData.storeUrl}.myshopify.com` : 'your-store.myshopify.com'}
+                    {form.watch('storeUrl') ? `${form.watch('storeUrl')}.myshopify.com` : 'your-store.myshopify.com'}
                   </div>
                 </div>
                 
@@ -459,10 +556,10 @@ const StoreGeneratorTab = () => {
                       {/* Store Header */}
                       <div className="text-center space-y-2">
                         <h3 className="text-xl font-bold">
-                          {storeData.name || 'Your Store Name'}
+                          {form.watch('name') || 'Your Store Name'}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {storeData.category || 'Premium Products'}
+                          {form.watch('category') || 'Premium Products'}
                         </p>
                       </div>
                       
@@ -550,19 +647,19 @@ const StoreGeneratorTab = () => {
               <div className="bg-gradient-to-br from-green-500/10 to-primary/10 p-6 rounded-xl border border-green-500/20">
                 <div className="text-center space-y-3">
                   <Store className="h-16 w-16 text-green-500 mx-auto" />
-                  <h3 className="text-xl font-bold">{storeData.name}</h3>
-                  <p className="text-sm text-muted-foreground">{storeData.storeUrl}.myshopify.com</p>
+                  <h3 className="text-xl font-bold">{form.watch('name')}</h3>
+                  <p className="text-sm text-muted-foreground">{form.watch('storeUrl')}.myshopify.com</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="bg-background/50 p-3 rounded-lg border border-primary/10">
                   <p className="text-sm text-muted-foreground">Theme</p>
-                  <p className="font-semibold">{storeData.theme}</p>
+                  <p className="font-semibold">{form.watch('theme')}</p>
                 </div>
                 <div className="bg-background/50 p-3 rounded-lg border border-primary/10">
                   <p className="text-sm text-muted-foreground">Products</p>
-                  <p className="font-semibold">{storeData.productCount}</p>
+                  <p className="font-semibold">{form.watch('productCount')}</p>
                 </div>
               </div>
 
