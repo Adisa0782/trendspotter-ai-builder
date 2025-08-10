@@ -107,60 +107,60 @@ const Auth = () => {
       </div>
 
       <div className="relative flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           
           {/* Left side - Hero content */}
-          <div className="text-center lg:text-left space-y-8 animate-slide-up">
+          <div className="text-center lg:text-left space-y-6 lg:space-y-8 animate-slide-up order-2 lg:order-1">
             <div className="space-y-4">
-              <div className="flex items-center justify-center lg:justify-start mb-6">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start mb-6 gap-3 sm:gap-4">
                 <div className="relative">
-                  <Target className="h-12 w-12 text-primary animate-glow" />
+                  <Target className="h-10 w-10 sm:h-12 sm:w-12 text-primary animate-glow" />
                   <div className="absolute -inset-2 bg-primary/20 rounded-full blur-lg animate-pulse" />
                 </div>
-                <div className="ml-4">
-                  <h1 className="text-4xl lg:text-5xl font-bold gradient-text">
+                <div className="text-center sm:text-left">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold gradient-text">
                     TrendSniper
                   </h1>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
                     <span className="text-sm font-medium text-primary">ELITE</span>
                     <Star className="h-4 w-4 text-primary fill-current" />
                   </div>
                 </div>
               </div>
               
-              <h2 className="text-3xl lg:text-4xl font-bold text-foreground leading-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground leading-tight">
                 Elite Product Intelligence
                 <br />
                 <span className="gradient-text">for Winning Dropshippers</span>
               </h2>
               
-              <p className="text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0">
                 Advanced AI-powered product analysis, real-time market intelligence, and premium insights trusted by elite entrepreneurs worldwide.
               </p>
             </div>
 
             {/* Feature highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-              <div className="glass-card p-4 hover-lift">
-                <Zap className="h-6 w-6 text-primary mb-2" />
-                <h3 className="font-semibold text-sm">Real-time Scanning</h3>
-                <p className="text-xs text-muted-foreground">Instant product analysis</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-6 lg:mt-8">
+              <div className="glass-card p-3 sm:p-4 hover-lift">
+                <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary mb-2 mx-auto sm:mx-0" />
+                <h3 className="font-semibold text-xs sm:text-sm text-center sm:text-left">Real-time Scanning</h3>
+                <p className="text-xs text-muted-foreground text-center sm:text-left">Instant product analysis</p>
               </div>
-              <div className="glass-card p-4 hover-lift">
-                <TrendingUp className="h-6 w-6 text-primary mb-2" />
-                <h3 className="font-semibold text-sm">Market Intelligence</h3>
-                <p className="text-xs text-muted-foreground">Advanced trend analytics</p>
+              <div className="glass-card p-3 sm:p-4 hover-lift">
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-primary mb-2 mx-auto sm:mx-0" />
+                <h3 className="font-semibold text-xs sm:text-sm text-center sm:text-left">Market Intelligence</h3>
+                <p className="text-xs text-muted-foreground text-center sm:text-left">Advanced trend analytics</p>
               </div>
-              <div className="glass-card p-4 hover-lift">
-                <Sparkles className="h-6 w-6 text-primary mb-2" />
-                <h3 className="font-semibold text-sm">AI Insights</h3>
-                <p className="text-xs text-muted-foreground">Premium analysis tools</p>
+              <div className="glass-card p-3 sm:p-4 hover-lift">
+                <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary mb-2 mx-auto sm:mx-0" />
+                <h3 className="font-semibold text-xs sm:text-sm text-center sm:text-left">AI Insights</h3>
+                <p className="text-xs text-muted-foreground text-center sm:text-left">Premium analysis tools</p>
               </div>
             </div>
           </div>
 
           {/* Right side - Auth form */}
-          <div className="w-full max-w-md mx-auto animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="w-full max-w-md mx-auto animate-slide-up order-1 lg:order-2" style={{ animationDelay: '0.2s' }}>
             <Card className="glass-card hover-glow border-2">
               <CardHeader className="space-y-1 text-center">
                 <div className="flex items-center justify-center mb-4">
@@ -217,7 +217,7 @@ const Auth = () => {
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full bg-gradient-to-r from-primary to-purple-400 hover:from-primary/90 hover:to-purple-400/90 text-white font-semibold py-3 hover-glow transition-all duration-300" 
+                        className="w-full bg-gradient-to-r from-primary to-purple-400 hover:from-primary/90 hover:to-purple-400/90 text-white font-semibold py-3 hover-glow transition-all duration-300 h-12" 
                         disabled={loading}
                       >
                         {loading ? (
@@ -275,7 +275,7 @@ const Auth = () => {
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full bg-gradient-to-r from-primary to-purple-400 hover:from-primary/90 hover:to-purple-400/90 text-white font-semibold py-3 hover-glow transition-all duration-300" 
+                        className="w-full bg-gradient-to-r from-primary to-purple-400 hover:from-primary/90 hover:to-purple-400/90 text-white font-semibold py-3 hover-glow transition-all duration-300 h-12" 
                         disabled={loading}
                       >
                         {loading ? (

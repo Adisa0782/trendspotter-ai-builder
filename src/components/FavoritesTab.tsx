@@ -172,10 +172,10 @@ export const FavoritesTab = () => {
         {favorites.map((favorite) => (
           <Card key={favorite.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="flex-1 space-y-3">
                   <div className="space-y-2">
-                    <h4 className="font-medium line-clamp-2">
+                    <h4 className="font-medium line-clamp-2 text-sm sm:text-base">
                       {favorite.metadata.title}
                     </h4>
                     
@@ -186,14 +186,14 @@ export const FavoritesTab = () => {
                       <Badge className={getVerdictColor(favorite.metadata.verdict)}>
                         {favorite.metadata.verdict.toUpperCase()}
                       </Badge>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
                         <Star className="h-3 w-3" />
                         {favorite.metadata.confidence}%
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-4 text-xs sm:text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {new Date(favorite.created_at).toLocaleDateString()}
@@ -201,21 +201,24 @@ export const FavoritesTab = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => window.open(favorite.product_url, '_blank')}
+                    className="flex-1 sm:flex-none h-9"
                   >
                     <ExternalLink className="h-4 w-4" />
+                    <span className="ml-2 sm:hidden">View</span>
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => removeFavorite(favorite.id)}
-                    className="text-destructive hover:text-destructive"
+                    className="text-destructive hover:text-destructive flex-1 sm:flex-none h-9"
                   >
                     <Trash2 className="h-4 w-4" />
+                    <span className="ml-2 sm:hidden">Remove</span>
                   </Button>
                 </div>
               </div>

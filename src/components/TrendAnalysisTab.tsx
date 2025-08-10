@@ -194,21 +194,22 @@ export const TrendAnalysisTab = () => {
           </Badge>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             placeholder="Enter keyword (e.g., fashion, tech, shoes)"
             value={newKeyword}
             onChange={(e) => setNewKeyword(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-            className="flex-1"
+            className="flex-1 h-10 sm:h-auto"
             maxLength={50}
           />
           <Button 
             onClick={addKeyword}
             disabled={!newKeyword.trim() || keywords.length >= 5}
-            className="px-4"
+            className="px-4 w-full sm:w-auto h-10 sm:h-auto"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4 mr-2 sm:mr-0" />
+            <span className="sm:hidden">Add Keyword</span>
           </Button>
         </div>
         
@@ -257,10 +258,10 @@ export const TrendAnalysisTab = () => {
 
       {/* Growth indicators */}
       {!loading && trendData.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {trendData.map((trend) => (
             <Card key={trend.keyword} className="glass-card hover-lift">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div 
                     className="w-3 h-3 rounded-full" 
@@ -268,8 +269,8 @@ export const TrendAnalysisTab = () => {
                   />
                   {getGrowthIcon(trend.growth)}
                 </div>
-                <h4 className="font-medium capitalize mb-1">{trend.keyword}</h4>
-                <p className={`text-sm font-semibold ${getGrowthColor(trend.growth)}`}>
+                <h4 className="font-medium capitalize mb-1 text-sm sm:text-base truncate">{trend.keyword}</h4>
+                <p className={`text-xs sm:text-sm font-semibold ${getGrowthColor(trend.growth)}`}>
                   {trend.growth > 0 ? '+' : ''}{trend.growth.toFixed(1)}%
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -290,8 +291,8 @@ export const TrendAnalysisTab = () => {
               Search Volume Trends
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="h-[400px] w-full">
+          <CardContent className="p-4 sm:p-6">
+            <div className="h-[300px] sm:h-[400px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -299,22 +300,25 @@ export const TrendAnalysisTab = () => {
                     dataKey="date" 
                     tickFormatter={formatDate}
                     stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
+                    fontSize={10}
+                    tick={{ fontSize: 10 }}
                   />
                   <YAxis 
                     stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
+                    fontSize={10}
+                    tick={{ fontSize: 10 }}
                   />
                   <Tooltip 
                     contentStyle={{
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: 'var(--radius)',
-                      color: 'hsl(var(--card-foreground))'
+                      color: 'hsl(var(--card-foreground))',
+                      fontSize: '14px'
                     }}
                     labelFormatter={(label) => `Date: ${formatDate(label)}`}
                   />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   {trendData.map((trend) => (
                     <Line
                       key={trend.keyword}
@@ -322,8 +326,8 @@ export const TrendAnalysisTab = () => {
                       dataKey={trend.keyword}
                       stroke={trend.color}
                       strokeWidth={2}
-                      dot={{ fill: trend.color, strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6, fill: trend.color }}
+                      dot={{ fill: trend.color, strokeWidth: 2, r: 3 }}
+                      activeDot={{ r: 5, fill: trend.color }}
                     />
                   ))}
                 </LineChart>

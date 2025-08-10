@@ -210,17 +210,17 @@ export const ScannerPanel = () => {
     <div className="space-y-6">
       {/* URL Input */}
       <div className="space-y-4">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             placeholder="Paste product URL here (AliExpress, Amazon, Shopify, TikTok)"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="flex-1"
+            className="flex-1 h-12 text-sm"
           />
           <Button 
             onClick={analyzeProduct} 
             disabled={loading}
-            className="bg-gradient-to-r from-primary to-primary/80"
+            className="bg-gradient-to-r from-primary to-primary/80 h-12 px-6 w-full sm:w-auto"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -230,30 +230,30 @@ export const ScannerPanel = () => {
         </div>
         
         {/* Demo URLs */}
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setUrl("https://www.aliexpress.com/item/1005003245887945.html")}
-            className="text-xs"
+            className="text-xs h-10 w-full"
           >
-            Demo AliExpress URL
+            Demo AliExpress
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setUrl("https://www.amazon.com/dp/B08N5WRWNW")}
-            className="text-xs"
+            className="text-xs h-10 w-full"
           >
-            Demo Amazon URL
+            Demo Amazon
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setUrl("https://example.myshopify.com/products/wireless-earbuds")}
-            className="text-xs"
+            className="text-xs h-10 w-full"
           >
-            Demo Shopify URL
+            Demo Shopify
           </Button>
         </div>
         
@@ -271,10 +271,10 @@ export const ScannerPanel = () => {
           <CardContent className="p-6">
             <div className="space-y-6">
               {/* Header */}
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold">{result.title}</h3>
-                  <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="space-y-2 flex-1">
+                  <h3 className="text-lg sm:text-xl font-semibold line-clamp-2">{result.title}</h3>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <Badge className={getVerdictColor(result.verdict)}>
                       {getVerdictIcon(result.verdict)}
                       {result.verdict.toUpperCase()}
@@ -282,12 +282,17 @@ export const ScannerPanel = () => {
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 text-primary" />
                       <span className="font-medium">{result.confidence}%</span>
-                      <span className="text-sm text-muted-foreground">confidence</span>
+                      <span className="text-sm text-muted-foreground hidden sm:inline">confidence</span>
                     </div>
                   </div>
                 </div>
                 
-                <Button variant="outline" onClick={addToFavorites}>
+                <Button 
+                  variant="outline" 
+                  onClick={addToFavorites}
+                  className="w-full sm:w-auto h-10"
+                  size="sm"
+                >
                   Add to Favorites
                 </Button>
               </div>
@@ -299,28 +304,28 @@ export const ScannerPanel = () => {
               </div>
 
               {/* Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                  <DollarSign className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Est. Revenue</p>
-                    <p className="font-medium">{result.estimatedRevenue}</p>
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm text-muted-foreground">Est. Revenue</p>
+                    <p className="font-medium text-sm sm:text-base truncate">{result.estimatedRevenue}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                  <TrendingUp className="h-5 w-5 text-blue-500" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Competition</p>
-                    <p className="font-medium">{result.competition}</p>
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm text-muted-foreground">Competition</p>
+                    <p className="font-medium text-sm sm:text-base">{result.competition}</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                  <Users className="h-5 w-5 text-purple-500" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Target Audience</p>
-                    <p className="font-medium text-xs">{result.targetAudience}</p>
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 sm:col-span-1 col-span-1">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm text-muted-foreground">Target Audience</p>
+                    <p className="font-medium text-xs sm:text-sm line-clamp-2">{result.targetAudience}</p>
                   </div>
                 </div>
               </div>

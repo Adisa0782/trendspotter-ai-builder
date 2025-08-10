@@ -223,33 +223,33 @@ const StoreGeneratorTab = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
-      <div className="text-center space-y-4 mb-8">
-        <div className="flex items-center justify-center gap-3">
+      <div className="text-center space-y-4 mb-6 sm:mb-8 px-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/30 backdrop-blur-sm">
-            <Store className="h-8 w-8 text-primary" />
+            <Store className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-blue-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-blue-500 bg-clip-text text-transparent">
             Store Generator
           </h1>
         </div>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
           Collaborate with your team to launch a fully ready Shopify store in minutes.
         </p>
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      {/* Responsive Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 max-w-7xl mx-auto px-4">
         {/* Left Column - Store Setup Form */}
         <div className="space-y-6">
 
           {/* Store Setup Form */}
           <Card className="backdrop-blur-xl bg-background/60 border border-primary/20 rounded-2xl shadow-2xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Settings className="h-6 w-6 text-primary" />
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 Store Setup
               </CardTitle>
-              <CardDescription className="text-base">
+              <CardDescription className="text-sm sm:text-base">
                 Configure your new Shopify store
               </CardDescription>
             </CardHeader>
@@ -423,39 +423,41 @@ const StoreGeneratorTab = () => {
                   <div className="space-y-3 pt-4">
                     <Button 
                       type="submit"
-                      className="w-full h-14 text-lg bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="w-full h-12 sm:h-14 text-base sm:text-lg bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 shadow-lg hover:shadow-xl transition-all duration-300"
                       disabled={isGenerating}
                     >
                       {isGenerating ? (
                         <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                          <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
                           Generating...
                         </>
                       ) : (
                         <>
-                          <Zap className="h-5 w-5 mr-2" />
+                          <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                           Generate Store
                         </>
                       )}
                     </Button>
                     
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Button 
                         type="button"
                         variant="outline" 
                         onClick={handleImportProducts}
                         disabled={isImporting}
-                        className="h-12 border-primary/30 hover:bg-primary/10"
+                        className="h-10 sm:h-12 border-primary/30 hover:bg-primary/10"
                       >
                         {isImporting ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Importing...
+                            <span className="hidden sm:inline">Importing...</span>
+                            <span className="sm:hidden">Import...</span>
                           </>
                         ) : (
                           <>
                             <Package className="h-4 w-4 mr-2" />
-                            Import Products
+                            <span className="hidden sm:inline">Import Products</span>
+                            <span className="sm:hidden">Import</span>
                           </>
                         )}
                       </Button>
@@ -465,7 +467,7 @@ const StoreGeneratorTab = () => {
                         variant="outline" 
                         onClick={handlePreviewStore}
                         disabled={isPreviewing}
-                        className="h-12 border-primary/30 hover:bg-primary/10"
+                        className="h-10 sm:h-12 border-primary/30 hover:bg-primary/10"
                       >
                         {isPreviewing ? (
                           <>
